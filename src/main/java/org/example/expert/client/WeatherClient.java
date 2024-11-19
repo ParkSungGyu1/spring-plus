@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Component
 public class WeatherClient {
@@ -56,7 +57,14 @@ public class WeatherClient {
     }
 
     private String getCurrentDate() {
+        /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+        return LocalDate.now().format(formatter);*/
+
+        //테스트 전용 랜덤 월 생성
+        Random random = new Random();
+        int month = random.nextInt(12) + 1;
+        LocalDate date = LocalDate.of(2024, month, 11);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
-        return LocalDate.now().format(formatter);
+        return date.format(formatter);
     }
 }
