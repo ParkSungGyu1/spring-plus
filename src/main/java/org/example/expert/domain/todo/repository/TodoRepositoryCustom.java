@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface TodoRepositoryCustom {
     Optional<Todo> findByIdWithUserDSL(Long todoId);
-    List<TodoSearchResponseDto> findByDynamicQuery(int page, int size, String weather, String title, String startDate, String endDate, String nickName);
+    List<TodoSearchResponseDto> findByDynamicQuery(int page, int size, String title, String startDate, String endDate, String nickName);
 }

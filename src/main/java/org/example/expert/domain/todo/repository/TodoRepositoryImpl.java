@@ -5,6 +5,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.domain.comment.entity.QComment;
+import org.example.expert.domain.manager.entity.QManager;
 import org.example.expert.domain.todo.dto.TodoSearchResponseDto;
 import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
@@ -12,6 +13,7 @@ import org.example.expert.domain.user.entity.QUser;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,10 +37,11 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     }
 
     @Override
-    public List<TodoSearchResponseDto> findByDynamicQuery(int page, int size, String weather, String title, String startDate, String endDate, String nickName) {
+    public List<TodoSearchResponseDto> findByDynamicQuery(int page, int size,String title, String startDate, String endDate, String nickName) {
         QTodo todo = QTodo.todo;
         QUser user = QUser.user;
         QComment comment = QComment.comment;
+        QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -52,22 +55,22 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
             builder.and(todo.createdAt.goe(LocalDate.parse(startDate).atStartOfDay()));
         }
         if (endDate != null && !endDate.isEmpty()) {
-            builder.and(todo.createdAt.loe(LocalDate.parse(endDate).atStartOfDay()));
+            builder.and(todo.createdAt.loe(LocalDate.parse(endDate).atTime(LocalTime.MAX)));
         }
 
         // 담당자 닉네임 검색
         if (nickName != null && !nickName.isEmpty()) {
-            builder.and(user.nickName.containsIgnoreCase(nickName));
+            builder.and(manager.user.nickName.containsIgnoreCase(nickName));
         }
 
         // 쿼리 실행
-
-        return queryFactory.select(Projections.fields(TodoSearchResponseDto.class,
+        return queryFactory.select(Projections.constructor(TodoSearchResponseDto.class,
                         todo.title,
-                        todo.managers.size().as("managerCount"),
-                        comment.count().as("commentCount")))
+                        manager.countDistinct().as("managerCount"),
+                        comment.id.countDistinct().as("commentCount")))
                 .from(todo)
-                .leftJoin(todo.managers)
+                .leftJoin(todo.managers, manager)
+                .leftJoin(manager.user, user)
                 .leftJoin(todo.comments, comment)
                 .where(builder)
                 .groupBy(todo.id)

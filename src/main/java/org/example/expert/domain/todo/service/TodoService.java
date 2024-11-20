@@ -92,7 +92,7 @@ public class TodoService {
         );
     }
 
-    public List<TodoSearchResponseDto> searchTodos(int page, int size, String weather, String title, String startDate, String endDate, String nickName) {
-        return todoRepository.findByDynamicQuery(page, size, weather, title, startDate, endDate, nickName);
+    public List<TodoSearchResponseDto> searchTodos(int page, int size, String title, String startDate, String endDate, String nickName) {
+        return todoRepository.findByDynamicQuery(page, size, title, startDate, endDate, nickName);
     }
 }

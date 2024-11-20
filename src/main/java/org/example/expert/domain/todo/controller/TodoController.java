@@ -2,8 +2,6 @@ package org.example.expert.domain.todo.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.expert.domain.common.annotation.Auth;
-import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.todo.dto.TodoSearchResponseDto;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
@@ -43,13 +41,12 @@ public class TodoController {
     public ResponseEntity<List<TodoSearchResponseDto>> searchTodos(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam String weather,
             @RequestParam String title,
             @RequestParam String startDate,
             @RequestParam String endDate,
             @RequestParam String nickName
     ) {
-        return ResponseEntity.ok(todoService.searchTodos(page, size, weather, title, startDate, endDate, nickName));
+        return ResponseEntity.ok(todoService.searchTodos(page, size, title, startDate, endDate, nickName));
     }
 
     @GetMapping("/todos/{todoId}")
