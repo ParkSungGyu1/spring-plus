@@ -48,11 +48,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
+        Long userId = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getId();
         String nickName = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getNickName();
         String email = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getEmail();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
 
-        String token = jwtUtil.createToken(1L,nickName,email, role);
+        String token = jwtUtil.createToken(userId,email, nickName, role);
         response.setHeader("Authorization", token);
         response.setStatus(HttpServletResponse.SC_OK);
     }
