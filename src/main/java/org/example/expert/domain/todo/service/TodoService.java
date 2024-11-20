@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.todo.dto.TodoSearchResponseDto;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +73,8 @@ public class TodoService {
         ));
     }
 
+
+
     public TodoResponse getTodo(long todoId) {
         Todo todo = todoRepository.findByIdWithUserDSL(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
@@ -85,5 +90,9 @@ public class TodoService {
                 todo.getCreatedAt(),
                 todo.getModifiedAt()
         );
+    }
+
+    public List<TodoSearchResponseDto> searchTodos(int page, int size, String weather, String title, String startDate, String endDate, String nickName) {
+        return todoRepository.findByDynamicQuery(page, size, weather, title, startDate, endDate, nickName);
     }
 }

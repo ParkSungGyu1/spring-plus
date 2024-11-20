@@ -1,11 +1,18 @@
 package org.example.expert.domain.todo.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.example.expert.domain.comment.entity.QComment;
+import org.example.expert.domain.todo.dto.TodoSearchResponseDto;
 import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
+import org.example.expert.domain.user.entity.QUser;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,4 +33,48 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
         return Optional.ofNullable(result);
     }
+
+    @Override
+    public List<TodoSearchResponseDto> findByDynamicQuery(int page, int size, String weather, String title, String startDate, String endDate, String nickName) {
+        QTodo todo = QTodo.todo;
+        QUser user = QUser.user;
+        QComment comment = QComment.comment;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 제목 검색
+        if (title != null && !title.isEmpty()) {
+            builder.and(todo.title.containsIgnoreCase(title));
+        }
+
+        // 생성일 범위 검색
+        if (startDate != null && !startDate.isEmpty()) {
+            builder.and(todo.createdAt.goe(LocalDate.parse(startDate).atStartOfDay()));
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            builder.and(todo.createdAt.loe(LocalDate.parse(endDate).atStartOfDay()));
+        }
+
+        // 담당자 닉네임 검색
+        if (nickName != null && !nickName.isEmpty()) {
+            builder.and(user.nickName.containsIgnoreCase(nickName));
+        }
+
+        // 쿼리 실행
+
+        return queryFactory.select(Projections.fields(TodoSearchResponseDto.class,
+                        todo.title,
+                        todo.managers.size().as("managerCount"),
+                        comment.count().as("commentCount")))
+                .from(todo)
+                .leftJoin(todo.managers)
+                .leftJoin(todo.comments, comment)
+                .where(builder)
+                .groupBy(todo.id)
+                .orderBy(todo.createdAt.desc())
+                .offset((long) page * size)
+                .limit(size)
+                .fetch();
+    }
+
 }
