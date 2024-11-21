@@ -45,14 +45,15 @@ public class UserTestRepository {
         }
     }
 
-    public TestUser findByName(int name) {
+    public TestUser findByName(String name) {
         TestUser user = null;
-        String sql = "SELECT id, name, age FROM test_user WHERE age = ?";
+        String sql = "SELECT id, name, age FROM test_user WHERE name = ?";
+        //String sql = "SELECT id, name, age FROM test_user WHERE name LIKE ?";
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setInt(1, name);
+            preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {

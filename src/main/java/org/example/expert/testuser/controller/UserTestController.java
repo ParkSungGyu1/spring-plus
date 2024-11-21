@@ -21,7 +21,7 @@ public class UserTestController {
     }
 
     @GetMapping("/user/data")
-    public TestUserResponse userData(@RequestParam int name){
+    public TestUserResponse userData(@RequestParam String name){
         return service.getUserData(name);
     }
 

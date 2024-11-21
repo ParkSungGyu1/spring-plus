@@ -32,7 +32,7 @@ public class UserDataGeneratorService {
         userTestRepository.bulkInsertUsers(users);
     }
 
-    public TestUserResponse getUserData(int name) {
+    public TestUserResponse getUserData(String name) {
         TestUser byName = userTestRepository.findByName(name);
         return new TestUserResponse(byName);
     }
