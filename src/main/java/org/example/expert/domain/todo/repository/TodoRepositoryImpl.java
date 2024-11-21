@@ -2,6 +2,7 @@ package org.example.expert.domain.todo.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.domain.comment.entity.QComment;
@@ -11,6 +12,7 @@ import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.user.entity.QUser;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,7 +24,10 @@ import java.util.Optional;
 public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
+    QTodo todo = QTodo.todo;
+    QUser user = QUser.user;
+    QComment comment = QComment.comment;
+    QManager manager = QManager.manager;
 
     @Override
     public Optional<Todo> findByIdWithUserDSL(Long todoId) {
@@ -38,10 +43,6 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
     @Override
     public List<TodoSearchResponseDto> findByDynamicQuery(int page, int size,String title, String startDate, String endDate, String nickName) {
-        QTodo todo = QTodo.todo;
-        QUser user = QUser.user;
-        QComment comment = QComment.comment;
-        QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -78,6 +79,20 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
                 .offset((long) page * size)
                 .limit(size)
                 .fetch();
+    }
+
+    private BooleanExpression eqNickName(String nickName){
+        if(nickName == null || nickName.isEmpty()){
+            return null;
+        }
+        return user.nickName.eq(nickName);
+    }
+
+    private BooleanExpression eqTitle(String title){
+        if(title == null || title.isEmpty()){
+            return null;
+        }
+        return todo.title.eq(title);
     }
 
 }
