@@ -23,8 +23,8 @@ public class UserDataGeneratorService {
 
         for (int i = 1; i <= count; i++) {
             TestUser user = new TestUser();
-            user.setId((long) 4000000+i);
-            user.setName("User" + (4000000+i));
+            user.setId((long) i);
+            user.setName("User" + i);
             user.setAge(20 + (i % 30)); // 20~49세
             users.add(user);
         }

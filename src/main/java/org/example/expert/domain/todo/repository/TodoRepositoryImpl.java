@@ -73,7 +73,10 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
                 .leftJoin(todo.managers, manager)
                 .leftJoin(manager.user, user)
                 .leftJoin(todo.comments, comment)
-                .where(builder)
+                .where(
+                        eqTitle(title),
+                        eqNickName(nickName)
+                )
                 .groupBy(todo.id)
                 .orderBy(todo.createdAt.desc())
                 .offset((long) page * size)
